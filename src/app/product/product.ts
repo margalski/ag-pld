@@ -3,5 +3,6 @@ export class Product {
     ProductSymbol: string
     ActivitySymbol: string
     AtivityDate: Date
+    AtivityDateStr: any
     PeopleQuantity: number
 }

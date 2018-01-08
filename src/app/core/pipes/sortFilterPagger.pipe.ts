@@ -7,15 +7,15 @@ import {NgModule, Pipe, PipeTransform } from '@angular/core';
 })
 
 @Pipe({
-    name: 'idFilter',
+    name: 'activityFilter',
     pure: false
 })
-export class ProductActivityIdFilterPipe implements PipeTransform {
+export class ActivitydFilterPipe implements PipeTransform {
     transform(items: any[], term): any {
         console.log('term', term);
       
         return term 
-            ? items.filter(item => item.ProductActivityId.indexOf(term) !== -1)
+            ? items.filter(item => item.ActivitySymbol.toLowerCase().indexOf(term.toLowerCase()) !== -1)
             : items;
     }
 }
@@ -29,7 +29,7 @@ export class ProductFilterPipe implements PipeTransform {
         console.log('term', term);
       
         return term 
-            ? items.filter(item => item.ProductSymbol.indexOf(term) !== -1)
+            ? items.filter(item => item.ProductSymbol.toLowerCase().indexOf(term.toLowerCase()) !== -1)
             : items;
     }
 }

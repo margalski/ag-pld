@@ -1,5 +1,5 @@
-import { NgModule, Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgModule, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser'
 
 import { Observable } from 'rxjs/Observable';
@@ -7,13 +7,15 @@ import { Observable } from 'rxjs/Observable';
 import { ProductRepository } from '../core/repository/product.repository';
 import { Product } from '../product/product';
 
-import { ProductActivityIdFilterPipe, ProductFilterPipe, SortByPipe } from '../core/pipes/sortFilterPagger.pipe'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { ActivitydFilterPipe, ProductFilterPipe, SortByPipe } from '../core/pipes/sortFilterPagger.pipe'
 
 @NgModule({
-  imports: [BrowserModule, FormsModule, ProductActivityIdFilterPipe, ProductFilterPipe],
-  exports: [ProductActivityIdFilterPipe, ProductFilterPipe],
-  declarations: [ProductActivityIdFilterPipe, ProductFilterPipe, SortByPipe],
-  providers: [ProductActivityIdFilterPipe, ProductFilterPipe]
+  imports: [BrowserModule, FormsModule, FormBuilder, FormControl, ReactiveFormsModule, ActivitydFilterPipe, ProductFilterPipe, NgbModule],
+  exports: [BrowserModule, FormsModule, FormBuilder, FormControl, ReactiveFormsModule, ActivitydFilterPipe, ProductFilterPipe],
+  declarations: [ActivitydFilterPipe, ProductFilterPipe, SortByPipe],
+  providers: [ActivitydFilterPipe, ProductFilterPipe]
 })
 
 @Component({
@@ -23,14 +25,43 @@ import { ProductActivityIdFilterPipe, ProductFilterPipe, SortByPipe } from '../c
 })
 export class ProductComponent implements OnInit {
 
-  Products: Product;
+  constructor(private _productRepository: ProductRepository, private _formBuilder: FormBuilder) { }
 
-  constructor(private _productRepository: ProductRepository) { }
+  @ViewChild('closeModal') closeModal: ElementRef;
 
-  ngOnInit() { this.GetProductList(); }
+  private Products: Product;
+  private Product: Product;
+  private ProductForm: FormGroup;
+
+  private productSymbols = [{ value: "A", name: "Produkt A" }, { value: "B", name: "Produkt B" }, { value: "C", name: "Produkt C" }];
+  private actionSymbols = [{ value: "A", name: "Czynność A" }, { value: "B", name: "Czynność B" }, { value: "C", name: "Czynność C" }];
+  private peopleQuantity = [{ value: "1", name: "Jedna" }, { value: "2", name: "Dwie" }];
+
+  ngOnInit() {
+    this.GetProductList();
+    this.InitProductForm();
+  }
+
+  InitProductForm() {
+    this.ProductForm = this._formBuilder.group({
+      'ProductSymbol': [this.productSymbols[0].value, Validators.required],
+      'ActivitySymbol': [this.actionSymbols[0].value, Validators.required],
+      'AtivityDateStr': [new Date().toLocaleString(), Validators.required],
+      'PeopleQuantity': [1, Validators.required]
+    });
+  }
 
   GetProductList() {
     this._productRepository.get('products').subscribe(s => this.Products = s);
-    //.subscribe(res => this._products = res);
   }
+
+  ProductAdd(product: Product) {
+    product.AtivityDate = new Date(product.AtivityDateStr.year, product.AtivityDateStr.month, product.AtivityDateStr.day);
+    this._productRepository.post('products/add', product).subscribe(s => {
+      this.closeModal.nativeElement.click();
+      this.GetProductList();
+    });
+
+  }
+
 }

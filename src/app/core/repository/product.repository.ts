@@ -30,6 +30,7 @@ export  class ProductRepository {
         let body = JSON.stringify(model);
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
+        console.log(body);
         return this._http.post(this.baseUrl+url, body, options)
           .map((response: Response) => <Product>response.json())
           .catch(this.handleError);

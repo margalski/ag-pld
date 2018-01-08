@@ -1,5 +1,5 @@
 <div class="col-md-12">
-  <div class="row p-b-10">
+  <div class="row p-b-10 p-t-10">
     <div class=" col-xs-6">
     </div>
     <div class="col col-xs-6 text-right">
@@ -11,44 +11,43 @@
 
 
       <div class="panel-body">
-        <table class="table table-striped table-bordered table-list">
+        <table class="table table-hover table-responsive table-bordered table-striped">
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Produkt</th>
-              <th>Czynność</th>
-              <th>Data</th>
-              <th>Ile osób?</th>
-              <th>
+            <tr class="no-border"> 
+              <th class="no-border">Produkt</th>
+              <th class="no-border">Czynność</th>
+              <th class="no-border">Data</th>
+              <th class="no-border">Ile osób?</th>
+              <th class="no-border">
                 <em class="fa fa-cog"></em>
               </th>
             </tr>
             <tr>
-              <th>
-                <input class="form-control" type="text" name="searchId" [(ngModel)]="searchId"> </th>
-              <th>
-                <input class="form-control" type="text" name="productSymbol" [(ngModel)]="productSymbol"> </th>
+                <th>
+                    <input class="form-control" type="text" name="productSymbol" [(ngModel)]="productSymbol"> </th>
+
+              <th scope="row">
+                <input class="form-control" type="text" name="activitySymbol" [(ngModel)]="activitySymbol"> </th>
+             
               <th> </th>
               <th> </th>
-              <th> </th>
-              <th></th>
+              <th> </th> 
             </tr>
 
           </thead>
           <tbody>
-            <tr *ngFor="let item of Products| idFilter: searchId | productFilter: productSymbol; let i = index; ">
-
-              <td>{{item.ProductActivityId}}</td>
+            <tr *ngFor="let item of Products| activityFilter: activitySymbol | productFilter: productSymbol; let i = index; ">
+ 
               <td>{{item.ProductSymbol}}</td>
               <td>{{item.ActivitySymbol}}</td>
-              <td>{{item.AtivityDate | date: 'HH:mm:ss d MMM yyyy'}}</td>
+              <td>{{item.AtivityDate | date: 'HH:mm dd-mm-yyyy'}}</td>
               <td>{{item.PeopleQuantity}} (os)</td>
 
               <td align="center">
-                <a class="btn btn-default">
+                <a class="btn btn-primary btn-sm">
                   <em class="fa fa-pencil"></em>
                 </a>
-                <a class="btn btn-danger">
+                <a class="btn btn-danger btn-sm">
                   <em class="fa fa-trash"></em>
                 </a>
               </td>
@@ -87,19 +86,50 @@
   <div class="modal fade" id="addForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
+
+        <form [formGroup]="ProductForm" (ngSubmit)="ProductAdd(ProductForm.value)">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Dodaj czynność</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Produkt</label> 
+              <select class="form-control" id="ProductSymbol" [formControl]="ProductForm.controls['ProductSymbol']" name="ProductSymbol">
+                <option *ngFor="let item of productSymbols" [value]="item.value">{{item.name}}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Czynność</label>
+              <select class="form-control" id="ActivitySymbol" [formControl]="ProductForm.controls['ActivitySymbol']" name="ActivitySymbol">
+                  <option *ngFor="let item of actionSymbols" [value]="item.value">{{item.name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Data <span style="color:red" [hidden]="ProductForm.controls['AtivityDateStr'].valid">*</span></label> 
+              <input  (click)="d.toggle()" class="form-control" placeholder="yyyy-mm-dd" value="2016-01-01" name="dp" [formControl]="ProductForm.controls['AtivityDateStr']" ngbDatepicker #d="ngbDatepicker">
+         
+        
+            </div>
+            <div class="form-group">
+              <label>Ile osób?</label>
+              <select class="form-control" id="PeopleQuantity" [formControl]="ProductForm.controls['PeopleQuantity']" name="PeopleQuantity">
+                  <option *ngFor="let item of peopleQuantity" [value]="item.value">{{item.name}}</option>
+                </select>
+            </div>
+
+
+          <!-- <small id="emailHelp" class="form-text text-muted">W dniu [{{ProductForm.controls['AtivityDateStr'].value.day}}/{{ProductForm.controls['AtivityDateStr'].value.month}}/{{ProductForm.controls['AtivityDateStr'].value.year}}] produkt [{{ProductForm.controls['ProductSymbol'].name}}] w czynności [{{ProductForm.controls['ActivitySymbol'].name}}] - ilośc osob [{{ProductForm.controls['PeopleQuantity'].name}}]</small> -->
+
+          </div> 
+          <div class="modal-footer">
+            <button type="button" #closeModal class="btn btn-secondary color-dark" data-dismiss="modal">Anuluj</button>
+            <button type="submit" [disabled]="!ProductForm.valid" class="btn btn-primary">Submit</button>
+          </div>
+
+        </form>
       </div>
     </div>
   </div>
